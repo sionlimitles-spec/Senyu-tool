@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SIONNIME — Anime Zine</title>
+<link rel="preconnect" href="https://graphql.anilist.co">
+<link rel="preconnect" href="https://s4.anilist.co" crossorigin>
+</head>
+<body class="font-body text-ink min-h-screen pb-24 md:pb-10 overflow-x-hidden">
+  <a class="ks-skip" href="#main" onclick="document.getElementById('main').focus()">Lewati ke konten</a>
+
+  <!-- ICON SPRITE -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15L20 12z" fill="currentColor"/></symbol>
+      <symbol id="i-prev" viewBox="0 0 24 24"><path d="M19 5.5v13L8.5 12z" fill="currentColor"/><path d="M5 5v14"/></symbol>
+      <symbol id="i-next" viewBox="0 0 24 24"><path d="M5 5.5v13L15.5 12z" fill="currentColor"/><path d="M19 5v14"/></symbol>
+      <symbol id="i-fs-enter" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+      <symbol id="i-fs-exit" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></symbol>
+      <symbol id="i-reload" viewBox="0 0 24 24"><path d="M20 12a8 8 0 10-2.4 5.7"/><path d="M20 4v6h-6"/></symbol>
+      <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3.5h12v17l-6-4.2-6 4.2z"/></symbol>
+      <symbol id="i-bookmark-fill" viewBox="0 0 24 24"><path d="M6 3.5h12v17l-6-4.2-6 4.2z" fill="currentColor"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.9-4.9"/></symbol>
+      <symbol id="i-search-pro" viewBox="0 0 24 24"><circle cx="10.2" cy="10.2" r="6.6"/><path d="M7.4 9.2a3.2 3.2 0 012.6-2.2" stroke-width="1.6" opacity=".75"/><path d="M15.2 15.2L20.6 20.6" stroke-width="3"/><path d="M19 3.2l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z" fill="currentColor" stroke-width="1"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+      <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 010 7M19.3 5.8a9 9 0 010 12.4"/></symbol>
+      <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z" fill="currentColor"/><path d="M17 9.5l4.5 5M21.5 9.5l-4.5 5"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5L12 3.5l9 8"/><path d="M5.5 10v10.5h4.5v-6h4v6h4.5V10"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5"/><rect x="13.5" y="4" width="6.5" height="6.5"/><rect x="4" y="13.5" width="6.5" height="6.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5"/></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" fill="currentColor"/></symbol>
+      <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2.8c.9 3.6 5.3 5.6 5.3 10.4a5.3 5.3 0 01-10.6 0c0-2.1 1-3.3 2.1-4.3.3 1.6 1 2.2 2 2.2 0-3.2-1.2-5.2 1.2-8.3z" fill="currentColor"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.6v.01"/></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8.5 5.5v13M15.5 5.5v13" stroke-width="4"/></symbol>
+      <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+      <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+      <symbol id="i-cc" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 10.2a2.4 2.4 0 100 3.6M17 10.2a2.4 2.4 0 100 3.6"/></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.2v.01"/></symbol>
+      <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+      <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+    </defs>
+  </svg>
+
+
+  <!-- TICKER -->
+  <div class="ks-ticker" aria-hidden="true"><div class="ks-ticker__track"><div class="ks-ticker__group"><span>SIONNIME OK</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span class="hl">SUB INDO</span><i>✦</i><span>NO ADS</span><i>✦</i><span>UPDATE HARIAN</span><i>✦</i><span>TRENDING NOW</span><i>✦</i></div><div class="ks-ticker__group"><span>SIONNIME OK</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span class="hl">SUB INDO</span><i>✦</i><span>NO ADS</span><i>✦</i><span>UPDATE HARIAN</span><i>✦</i><span>TRENDING NOW</span><i>✦</i></div><div class="ks-ticker__group"><span>SIONNIME OK</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span class="hl">SUB INDO</span><i>✦</i><span>NO ADS</span><i>✦</i><span>UPDATE HARIAN</span><i>✦</i><span>TRENDING NOW</span><i>✦</i></div><div class="ks-ticker__group"><span>SIONNIME OK</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span class="hl">SUB INDO</span><i>✦</i><span>NO ADS</span><i>✦</i><span>UPDATE HARIAN</span><i>✦</i><span>TRENDING NOW</span><i>✦</i></div><div class="ks-ticker__group"><span>SIONNIME OK</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span class="hl">SUB INDO</span><i>✦</i><span>NO ADS</span><i>✦</i><span>UPDATE HARIAN</span><i>✦</i><span>TRENDING NOW</span><i>✦</i></div><div class="ks-ticker__group"><span>SIONNIME OK</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span class="hl">SUB INDO</span><i>✦</i><span>NO ADS</span><i>✦</i><span>UPDATE HARIAN</span><i>✦</i><span>TRENDING NOW</span><i>✦</i></div></div></div>
+  <div class="ks-ticker ks-ticker--rev" aria-hidden="true"><div class="ks-ticker__track"><div class="ks-ticker__group"><span>NEW EPISODES</span><i>✦</i><span>BINGE MODE</span><i>✦</i><span class="hl">WATCH LIST</span><i>✦</i><span>FRESH DROPS</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span>VOL.01</span><i>✦</i></div><div class="ks-ticker__group"><span>NEW EPISODES</span><i>✦</i><span>BINGE MODE</span><i>✦</i><span class="hl">WATCH LIST</span><i>✦</i><span>FRESH DROPS</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span>VOL.01</span><i>✦</i></div><div class="ks-ticker__group"><span>NEW EPISODES</span><i>✦</i><span>BINGE MODE</span><i>✦</i><span class="hl">WATCH LIST</span><i>✦</i><span>FRESH DROPS</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span>VOL.01</span><i>✦</i></div><div class="ks-ticker__group"><span>NEW EPISODES</span><i>✦</i><span>BINGE MODE</span><i>✦</i><span class="hl">WATCH LIST</span><i>✦</i><span>FRESH DROPS</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span>VOL.01</span><i>✦</i></div><div class="ks-ticker__group"><span>NEW EPISODES</span><i>✦</i><span>BINGE MODE</span><i>✦</i><span class="hl">WATCH LIST</span><i>✦</i><span>FRESH DROPS</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span>VOL.01</span><i>✦</i></div><div class="ks-ticker__group"><span>NEW EPISODES</span><i>✦</i><span>BINGE MODE</span><i>✦</i><span class="hl">WATCH LIST</span><i>✦</i><span>FRESH DROPS</span><i>✦</i><span>ANIME ZINE</span><i>✦</i><span>VOL.01</span><i>✦</i></div></div></div>
+
+  <!-- MASTHEAD (tidak sticky) -->
+  <header class="ks-mast" id="ksHeader">
+    <span class="ks-mast__kanji" aria-hidden="true">配信</span>
+    <div class="ks-mast__row">
+      <div class="ks-brand" role="button" tabindex="0" aria-label="SIONNIME, ke beranda" onclick="playSound('click'); goHome()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goHome()}">
+        <span class="ks-brand__txt">
+          <b>SION<i>NIME</i><u>OK</u></b>
+          <span class="ks-brand__meta"><span class="ks-tape">ANIME ZINE</span><em id="mastDate">VOL.01</em></span>
+        </span>
+      </div>
+      <div class="ks-actions">
+        <button id="searchBtn" type="button" class="ks-iconbtn ks-iconbtn--search" onclick="playSound('click'); showSearch()" aria-label="Cari anime"><span class="ks-sheen" aria-hidden="true"></span><svg class="ico"><use href="#i-search-pro"/></svg></button>
+        <button id="muteBtn" type="button" class="ks-iconbtn" onclick="toggleSound()" aria-label="Matikan suara"><svg class="ico"><use href="#i-sound"/></svg></button>
+      </div>
+    </div>
+    <nav class="ks-mast__nav" aria-label="Menu utama">
+      <button type="button" data-nav="home" class="is-active" onclick="playSound('click'); goHome()"><svg class="ico"><use href="#i-home"/></svg>Beranda</button>
+      <button type="button" data-nav="search" onclick="playSound('click'); showSearch()"><svg class="ico"><use href="#i-search"/></svg>Cari</button>
+      <button type="button" data-nav="watchlist" onclick="playSound('click'); showWatchlist()"><svg class="ico"><use href="#i-bookmark"/></svg>Watchlist<em class="ks-badge js-wl-badge is-zero">0</em></button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1" class="max-w-[1400px] mx-auto px-4 md:px-8 mt-6" style="outline:0">
+    <h1 class="ks-sr">SIONNIME — Anime Zine</h1>
+    <div id="srStatus" class="ks-sr" role="status" aria-live="polite"></div>
+
+    <!-- HERO -->
+    <section id="heroSection" class="ks-hero hidden" aria-roledescription="carousel" aria-label="Anime unggulan">
+      <div class="ks-hero__bg"><img id="heroBgImg" src="" alt=""></div>
+      <span class="ks-hero__shade"></span><span class="ks-hero__dots"></span><span class="ks-hero__slab"></span>
+      <span class="ks-hero__kanji" aria-hidden="true">注目</span>
+      <span class="ks-hero__rank" id="heroRank" aria-hidden="true">01</span>
+
+      <div class="ks-hero__inner" id="heroInner">
+        <div class="ks-hero__poster">
+          <span class="ks-tape">FEATURED</span>
+          <img id="heroPoster" src="" alt="">
+          <span class="ks-hero__score"><svg class="ico"><use href="#i-star"/></svg><span id="heroScoreText"></span></span>
+        </div>
+        <div class="ks-hero__head">
+          <div class="ks-chips">
+            <span class="ks-chip ks-chip--pink"><svg class="ico"><use href="#i-flame"/></svg>Trending</span>
+            <span id="heroMeta" class="ks-chip"></span>
+          </div>
+          <h2 id="heroTitle" class="ks-hero__title"></h2>
+        </div>
+        <div class="ks-hero__body">
+          <div id="heroGenres" class="ks-hero__genres"></div>
+          <p id="heroDesc" class="ks-hero__desc"></p>
+          <div class="ks-hero__cta">
+            <button id="heroPlayBtn" type="button" class="ks-btn ks-btn--yellow ks-btn--lg ks-btn--play"><svg class="ico"><use href="#i-play"/></svg>Tonton</button>
+            <button id="heroDetailBtn" type="button" class="ks-btn ks-btn--lg"><svg class="ico"><use href="#i-info"/></svg>Detail</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ks-hero__nav">
+        <button type="button" class="ks-navbtn" onclick="playSound('click'); heroStep(-1)" aria-label="Slide sebelumnya"><svg class="ico"><use href="#i-chev-l"/></svg></button>
+        <div id="heroDots" class="ks-progress"></div>
+        <button type="button" id="heroPause" class="ks-navbtn" onclick="playSound('click'); toggleHeroPause()" aria-pressed="false" aria-label="Jeda pergantian slide"><svg class="ico"><use id="heroPauseIcon" href="#i-pause"/></svg></button>
+        <span class="ks-hero__count"><b id="heroIdx">01</b>/<span id="heroTotal">04</span></span>
+        <button type="button" class="ks-navbtn" onclick="playSound('click'); heroStep(1)" aria-label="Slide berikutnya"><svg class="ico"><use href="#i-chev-r"/></svg></button>
+      </div>
+    </section>
+
+    <!-- CONTINUE -->
+    <section id="continueSection" class="mb-10 hidden">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="tape">▶ CONTINUE WATCHING</span>
+        <button onclick="clearHistory()" class="text-xs font-bold text-ink/70 hover:text-blood underline">Hapus</button>
+      </div>
+      <div id="continueGrid" class="flex gap-4 overflow-x-auto pb-4 hidden-scroll"></div>
+    </section>
+
+    <!-- SEARCH VIEW (halaman khusus pencarian) -->
+    <section id="searchView" class="ks-sv hidden" aria-label="Pencarian anime">
+      <form class="ks-sv__hero" role="search" onsubmit="event.preventDefault(); playSound('click'); submitSearch()">
+        <span class="ks-tape">PENCARIAN</span>
+        <h2 class="ks-sv__title">Cari anime</h2>
+        <label for="searchInput" class="ks-sr">Judul anime</label>
+        <div class="ks-sv__box">
+          <svg class="ico ks-sv__ico"><use href="#i-search"/></svg>
+          <input type="text" id="searchInput" placeholder="Ketik judul, mis. Naruto…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+          <button type="button" id="searchClear" class="ks-sv__clear hidden" onclick="clearSearch()" aria-label="Hapus pencarian"><svg class="ico"><use href="#i-close"/></svg></button>
+          <button type="submit" class="ks-sv__go">Cari</button>
+        </div>
+      </form>
+
+      <div id="recentWrap" class="ks-sv__block hidden">
+        <div class="ks-sv__head"><h3><svg class="ico"><use href="#i-reload"/></svg>Pencarian terakhir</h3><button type="button" onclick="clearRecent()">Hapus</button></div>
+        <div id="recentList" class="ks-sv__chips"></div>
+      </div>
+      <div class="ks-sv__block">
+        <div class="ks-sv__head"><h3><svg class="ico"><use href="#i-flame"/></svg>Coba cari</h3></div>
+        <div id="suggestList" class="ks-sv__chips"></div>
+      </div>
+      <div class="ks-sv__block">
+        <div class="ks-sv__head"><h3><svg class="ico"><use href="#i-grid"/></svg>Jelajah genre</h3></div>
+        <div id="svGenres" class="ks-sv__chips ks-sv__chips--genre"></div>
+      </div>
+    </section>
+
+    <!-- FILTER -->
+    <section id="filterSection" class="mb-6">
+      <div class="flex items-end justify-between mb-3 flex-wrap gap-2">
+        <div class="flex items-end gap-2">
+          <span class="font-display text-xs uppercase bg-ink text-yellow px-2 py-1">SORT</span>
+          <span class="barcode"></span>
+        </div>
+      </div>
+      <div id="sortTabs" class="flex flex-wrap gap-2 mb-4">
+        <button data-sort="TRENDING_DESC" onclick="changeSort('TRENDING_DESC', this)" class="sort-tab chip-active px-4 py-2 bg-white border-3 border-ink font-bold text-sm shadow-brutal-sm btn-brutal uppercase">🔥 Trending</button>
+        <button data-sort="SEASONAL" onclick="changeSort('SEASONAL', this)" class="sort-tab px-4 py-2 bg-white border-3 border-ink font-bold text-sm shadow-brutal-sm btn-brutal uppercase">📺 Musim Ini</button>
+        <button data-sort="POPULARITY_DESC" onclick="changeSort('POPULARITY_DESC', this)" class="sort-tab px-4 py-2 bg-white border-3 border-ink font-bold text-sm shadow-brutal-sm btn-brutal uppercase">⭐ Populer</button>
+        <button data-sort="SCORE_DESC" onclick="changeSort('SCORE_DESC', this)" class="sort-tab px-4 py-2 bg-white border-3 border-ink font-bold text-sm shadow-brutal-sm btn-brutal uppercase">🏆 Rating</button>
+        <button data-sort="START_DATE_DESC" onclick="changeSort('START_DATE_DESC', this)" class="sort-tab px-4 py-2 bg-white border-3 border-ink font-bold text-sm shadow-brutal-sm btn-brutal uppercase">🆕 Terbaru</button>
+      </div>
+      <div id="genreChips" class="flex gap-2 overflow-x-auto pb-2 hidden-scroll"></div>
+    </section>
+
+    <div class="flex items-center justify-between mb-6 gap-3">
+      <div class="relative min-w-0 flex items-center gap-3">
+        <span class="font-display text-5xl text-ink/10 leading-none">01</span>
+        <h2 id="sectionTitle" class="font-display text-2xl md:text-4xl uppercase marker inline-block">Trending Anime</h2>
+      </div>
+      <button id="backToHomeBtn" onclick="playSound('click'); goHome()" class="hidden shrink-0 text-xs md:text-sm font-bold bg-white border-3 border-ink px-3 md:px-4 py-2 shadow-brutal-sm btn-brutal hover:bg-gray-100 uppercase">← KEMBALI</button>
+    </div>
+
+    <div id="animeGrid" aria-live="off" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6"></div>
+
+    <div id="loadMoreWrap" class="text-center mt-10 hidden">
+      <button id="loadMoreBtn" onclick="loadMore()" class="px-8 py-3 bg-ink text-yellow border-3 border-ink font-display text-lg shadow-brutal btn-brutal hover:bg-ink/80 uppercase">
+        MUAT LEBIH BANYAK ↓
+      </button>
+    </div>
+
+    <div class="mt-16 pt-8 border-t-4 border-ink flex items-center justify-between flex-wrap gap-3">
+      <p class="font-display text-2xl uppercase">ANIME ZINE <span class="text-pink">/</span> VOL. 01</p>
+      <div class="flex items-center gap-2">
+        <span class="barcode"></span>
+        <span class="text-[10px] font-bold tracking-widest uppercase">SIONNIME © <span id="year">2026</span></span>
+      </div>
+    </div>
+  </main>
+
+    <!-- MOBILE NAV -->
+  <nav class="ks-dock" id="ksNav" aria-label="Navigasi utama">
+    <button type="button" data-nav="home" class="is-active" onclick="playSound('click'); goHome()">
+      <span class="ks-dock__ico"><svg class="ico"><use href="#i-home"/></svg></span><span class="ks-dock__lbl">Home</span>
+    </button>
+    <button type="button" data-nav="search" onclick="playSound('click'); showSearch()">
+      <span class="ks-dock__ico"><svg class="ico"><use href="#i-search"/></svg></span><span class="ks-dock__lbl">Search</span>
+    </button>
+    <button type="button" data-nav="watchlist" onclick="playSound('click'); showWatchlist()">
+      <span class="ks-dock__ico"><svg class="ico"><use href="#i-bookmark"/></svg><em class="ks-badge js-wl-badge is-zero">0</em></span><span class="ks-dock__lbl">Watchlist</span>
+    </button>
+  </nav>
+
+  <div id="toastContainer" role="status" aria-live="polite" class="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-[100] space-y-2 pointer-events-none w-[90%] max-w-sm"></div>
+
+  <!-- DETAIL MODAL -->
+  <div id="detailModal" class="fixed inset-0 z-50 hidden items-start justify-center p-3 md:p-6 bg-ink/80 backdrop-blur-sm overflow-y-auto fade-in">
+    <div role="dialog" aria-modal="true" aria-labelledby="detailTitle" class="relative w-full max-w-3xl bg-paper border-4 border-ink shadow-brutal-lg my-4 modal-pop">
+      <div class="relative h-40 md:h-60 bg-ink overflow-hidden">
+        <img id="detailBanner" src="" class="w-full h-full object-cover opacity-60" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-paper via-transparent to-transparent"></div>
+        <button type="button" data-autofocus onclick="playSound('click'); closeDetail()" aria-label="Tutup" class="ks-iconbtn ks-iconbtn--red" style="position:absolute;top:12px;right:12px"><svg class="ico"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="relative px-4 md:px-8 pb-6 -mt-20 md:-mt-28">
+        <div class="flex gap-3 md:gap-5 items-end">
+          <img id="detailCover" src="" class="w-24 md:w-40 aspect-[2/3] object-cover border-4 border-ink shadow-brutal shrink-0" alt="">
+          <div class="flex-1 pb-1 min-w-0">
+            <h2 id="detailTitle" class="font-display text-xl md:text-3xl uppercase leading-tight mb-2 line-clamp-2"></h2>
+            <div id="detailMeta" class="flex flex-wrap gap-1.5 text-[10px] md:text-xs font-bold"></div>
+          </div>
+        </div>
+        <div id="detailGenres" class="flex flex-wrap gap-1.5 mt-4"></div>
+        <p id="detailDesc" class="mt-4 text-sm md:text-base leading-relaxed text-ink/70"></p>
+        <div id="detailStudios" class="mt-3 text-xs font-bold text-ink/60"></div>
+        <div class="mt-5 flex flex-col sm:flex-row gap-3">
+          <button type="button" onclick="playSound('click'); watchFromDetail()" class="ks-btn ks-btn--yellow ks-btn--lg ks-btn--play" style="flex:1"><svg class="ico"><use href="#i-play"/></svg>Tonton Sekarang</button>
+          <button type="button" onclick="playSound('click'); toggleWatchlistFromDetail()" id="detailBookmarkBtn" class="ks-btn ks-btn--lg ks-btn--bm"><svg class="ico"><use id="detailBookmarkIcon" href="#i-bookmark"/></svg><span id="detailBookmarkText">SIMPAN</span></button>
+        </div>
+        <div id="detailRecsWrap" class="mt-6 hidden">
+          <h3 class="font-display text-sm uppercase mb-3 border-b-3 border-ink pb-2">Rekomendasi Serupa</h3>
+          <div id="detailRecs" class="grid grid-cols-3 md:grid-cols-4 gap-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EPISODE MODAL -->
+  <div id="episodeModal" class="ks-modal ks-ep hidden">
+    <div class="ks-ep__backdrop" onclick="closeEpisodeModal()"></div>
+    <div class="ks-ep__sheet" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="ks-ep__head">
+        <div class="ks-ep__poster"><img id="epPoster" src="" alt=""></div>
+        <div class="ks-ep__titles">
+          <span class="ks-tape">PILIH EPISODE</span>
+          <h3 id="modalTitle">Judul Anime</h3>
+          <p id="modalSubtitle">0 Episode</p>
+        </div>
+        <button type="button" class="ks-iconbtn ks-iconbtn--red" onclick="playSound('click'); closeEpisodeModal()" aria-label="Tutup"><svg class="ico"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="ks-ep__bar">
+        <button type="button" id="epContinueBtn" class="ks-btn ks-btn--pink ks-btn--play hidden" onclick="playSound('click'); continueFromModal()"><svg class="ico"><use href="#i-play"/></svg>Lanjut EP <b id="epContinueNum"></b></button>
+        <button type="button" class="ks-btn ks-btn--prev" onclick="playSound('click'); pickEpisode(1)"><svg class="ico"><use href="#i-prev"/></svg>Dari awal</button>
+        <label class="ks-jump" id="epJumpBox"><svg class="ico"><use href="#i-search"/></svg><input id="epJump" type="number" min="1" inputmode="numeric" placeholder="Ke EP…" aria-label="Lompat ke episode" onkeydown="if(event.key==='Enter') jumpEpisode()"><button type="button" onclick="playSound('click'); jumpEpisode()">GO</button></label>
+      </div>
+      <div id="epRanges" class="ks-ep__ranges hidden"></div>
+      <div id="episodeList" class="ks-ep__grid"></div>
+    </div>
+  </div>
+
+  <!-- PLAYER MODAL -->
+  <div id="playerModal" class="ks-modal ks-player hidden">
+    <div class="ks-player__card" role="dialog" aria-modal="true" aria-labelledby="playerTitle">
+
+      <!-- Area video: wrapper INI yang di-fullscreen, jadi tombol episode ikut tampil di layar penuh -->
+      <div id="videoWrap" class="ks-stage">
+        <div id="videoContainer" class="ks-stage__video"></div>
+
+        <div id="playerLoading" class="ks-overlay">
+          <div class="ks-spin"></div>
+          <h4>Memuat Video...</h4>
+        </div>
+
+        <div id="playerError" class="ks-overlay ks-overlay--err hidden">
+          <div class="ks-overlay__icon"><svg class="ico"><use href="#i-alert"/></svg></div>
+          <h4>Server Gagal Dimuat</h4>
+          <p>Coba reload atau nyalakan VPN.</p>
+          <button type="button" class="ks-btn ks-btn--yellow ks-btn--reload" onclick="playSound('click'); loadVideo()"><svg class="ico"><use href="#i-reload"/></svg>Coba Lagi</button>
+        </div>
+
+        <!-- Lapisan ketuk: aktif hanya saat kontrol layar-penuh disembunyikan -->
+        <div id="tapCatcher" class="ks-catcher" onclick="fsShowUI()" aria-hidden="true"></div>
+
+        <!-- Hanya tampil saat layar penuh -->
+        <div class="ks-fsui ks-autohide">
+          <span id="overlayEp" class="ks-chip ks-chip--yellow">EP 1 / 12</span>
+          <button type="button" class="ks-iconbtn ks-iconbtn--red" onclick="toggleFullscreen()" aria-label="Keluar layar penuh"><svg class="ico"><use href="#i-fs-exit"/></svg></button>
+        </div>
+
+        <button type="button" id="overlayPrevBtn" class="ks-nav ks-nav--prev ks-autohide" onclick="playSound('click'); changeEpisode(-1)" aria-label="Episode sebelumnya"><svg class="ico"><use href="#i-prev"/></svg></button>
+        <button type="button" id="overlayNextBtn" class="ks-nav ks-nav--next ks-autohide" onclick="playSound('click'); changeEpisode(1)" aria-label="Episode berikutnya"><svg class="ico"><use href="#i-next"/></svg></button>
+      </div>
+
+      <!-- DOCK KONTROL -->
+      <div class="ks-bar">
+        <div class="ks-bar__group">
+          <button type="button" id="dockPrevBtn" class="ks-btn ks-btn--prev" onclick="playSound('click'); changeEpisode(-1)"><svg class="ico"><use href="#i-prev"/></svg><span class="ks-only-sm">Sebelumnya</span><span class="ks-hide-sm">Prev</span></button>
+          <span id="dockEpLabel" class="ks-eplabel">EP 1 / 12</span>
+          <button type="button" id="dockNextBtn" class="ks-btn ks-btn--next" onclick="playSound('click'); changeEpisode(1)"><span class="ks-only-sm">Berikutnya</span><span class="ks-hide-sm">Next</span><svg class="ico"><use href="#i-next"/></svg></button>
+        </div>
+        <div class="ks-bar__group">
+          <button type="button" id="fsBtn" class="ks-btn ks-btn--yellow ks-btn--fs" onclick="toggleFullscreen()"><svg class="ico"><use id="fsIcon" href="#i-fs-enter"/></svg><span id="fsBtnText">Layar Penuh</span></button>
+          <button type="button" class="ks-btn ks-btn--pink ks-btn--reload" onclick="playSound('click'); loadVideo()" aria-label="Reload video"><svg class="ico"><use href="#i-reload"/></svg><span class="ks-only-sm">Reload</span></button>
+        </div>
+      </div>
+
+      <!-- INFO & AKSI -->
+      <div class="ks-info">
+        <div class="ks-info__main">
+          <h2 id="playerTitle">Judul Anime</h2>
+          <div class="ks-chips">
+            <span class="ks-chip" style="background:var(--cyan)">MegaPlay</span>
+            <span id="playerEpInfo" class="ks-chip">EP 1 / 12</span>
+          </div>
+          <div class="ks-tips">
+            <div class="ks-tip"><svg class="ico"><use href="#i-cc"/></svg><span><b>Subtitle:</b> pilih lewat ikon CC / ⚙ di dalam video. Tidak semua anime punya sub Indonesia dari server.</span></div>
+            <div class="ks-tip"><svg class="ico"><use href="#i-fs-enter"/></svg><span><b>Layar penuh:</b> pakai tombol <b>LAYAR PENUH</b> di bawah video. Kontrol episode otomatis sembunyi setelah 5 detik; ketuk layar untuk memunculkannya lagi.</span></div>
+          </div>
+        </div>
+        <div class="ks-info__side">
+          <button type="button" class="ks-btn ks-btn--cyan ks-btn--grid" onclick="playSound('click'); openEpisodeModal(playerState.idMal, playerState.title, playerState.totalEps, playerState.coverImage)"><svg class="ico"><use href="#i-grid"/></svg>Ganti Episode</button>
+          <button type="button" class="ks-btn ks-btn--red" onclick="playSound('click'); closePlayerModal()"><svg class="ico"><use href="#i-close"/></svg>Tutup Video</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
