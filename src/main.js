@@ -29,13 +29,14 @@ import * as features_home from './js/features/home.js';
 import * as features_nav from './js/features/nav.js';
 import * as features_player from './js/features/player.js';
 import * as features_search from './js/features/search.js';
+import * as features_social from './js/features/social.js';
 import * as features_watchlist from './js/features/watchlist.js';
 import * as ui_cards from './js/ui/cards.js';
 import * as ui_keyboard from './js/ui/keyboard.js';
 import * as ui_ui from './js/ui/ui.js';
 
 // Atribut onclick="..." di HTML butuh fungsi global, jadi semua fungsi modul dipasang ke window
-Object.assign(window, core_api, core_audio, core_state, core_utils, features_browse, features_detail, features_episodes, features_history, features_home, features_nav, features_player, features_search, features_watchlist, ui_cards, ui_keyboard, ui_ui);
+Object.assign(window, core_api, core_audio, core_state, core_utils, features_browse, features_detail, features_episodes, features_history, features_home, features_nav, features_player, features_search, features_social, features_watchlist, ui_cards, ui_keyboard, ui_ui);
 
 function initApp() {
   renderGenreChips(); updateMuteBtn(); updateWlBadge(false);

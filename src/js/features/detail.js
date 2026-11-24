@@ -5,6 +5,7 @@ import { MEDIA_FIELDS } from '../core/config.js';
 import { animeStore } from '../core/state.js';
 import { $, animeTitle, epCount, esc, formatScore, stripHtml, syncScrollLock } from '../core/utils.js';
 import { openEpisodeModal } from './episodes.js';
+import { openSocial, resetSocial } from './social.js';
 import { isInWatchlist, toggleWatchlistById } from './watchlist.js';
 import { hideModal, showModalFx, showToast } from '../ui/ui.js';
 
@@ -28,6 +29,7 @@ export async function openDetail(animeId) {
   $('detailStudios').textContent = '';
   $('detailRecsWrap').classList.add('hidden');
   updateDetailBookmarkUI();
+  openSocial(base.idMal);
   showModalFx('detailModal'); $('detailModal').classList.remove('hidden'); $('detailModal').classList.add('flex');
   $('detailModal').scrollTop = 0;
   syncScrollLock();
@@ -59,7 +61,7 @@ export async function openDetail(animeId) {
     }
   } catch (err) {}
 }
-export function closeDetail() { detailCurrentAnime = null; hideModal('detailModal'); }
+export function closeDetail() { detailCurrentAnime = null; resetSocial(); hideModal('detailModal'); }
 export function watchFromDetail() {
   if (!detailCurrentAnime) return;
   const a = detailCurrentAnime;

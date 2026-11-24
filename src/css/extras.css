@@ -47,3 +47,13 @@
   #detailModal,#episodeModal,#playerModal{transition:opacity .22s ease}
   #detailModal.is-out,#episodeModal.is-out,#playerModal.is-out{opacity:0;pointer-events:none}
   @media (prefers-reduced-motion:reduce){.ks-sheen,.ks-ov__play::before{animation:none!important}.ks-card .card-hover::after{display:none}}
+
+  /* ===== Like, rating, komentar ===== */
+  .ks-star{display:inline-grid;place-items:center;width:34px;height:34px;background:transparent;border:0;cursor:pointer;transition:transform .25s var(--ease-pop)}
+  .ks-star .ico{font-size:26px}
+  .ks-star:hover:not(:disabled){transform:scale(1.2) rotate(-8deg)}
+  .ks-star:disabled{cursor:default}
+  .ks-like[aria-pressed="true"]{color:#fff}
+  .ks-like[aria-pressed="true"] .ico{animation:ksHeart .45s var(--ease-pop)}
+  @keyframes ksHeart{0%{transform:scale(.6)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+  @media (prefers-reduced-motion:reduce){.ks-like[aria-pressed="true"] .ico{animation:none}.ks-star{transition:none}}

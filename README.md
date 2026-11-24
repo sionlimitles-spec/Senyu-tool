@@ -14,7 +14,7 @@ src/
     core/             config, state, utils, audio, api (AniList)
     ui/               ui (toast, modal, nav), cards, keyboard
     features/         home, browse, search, detail, watchlist,
-                      history, episodes, player, nav
+                      history, episodes, player, nav, social
 ```
 
 ## Jalankan lokal
@@ -38,6 +38,13 @@ npm run preview
 
 Situs statis sehingga panggilan ke AniList dan iframe MegaPlay tidak diblokir.
 Alternatif: Netlify atau Vercel dengan pengaturan build yang sama.
+
+## Like, rating, komentar (Supabase)
+
+Data disimpan di proyek Supabase `Sion-tool-01` (tabel `anime_likes`, `anime_ratings`, `anime_comments`).
+Tabel dikunci RLS tanpa policy; klien hanya memanggil fungsi RPC (`anime_social`, `toggle_like`, `set_rating`,
+`list_comments`, `add_comment`, `delete_comment`). Identitas = UUID acak per browser di `localStorage`
+(tanpa login). URL dan key publishable ada di `src/js/core/config.js`.
 
 ## Catatan
 
