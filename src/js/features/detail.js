@@ -1,7 +1,7 @@
 // features/detail.js
 import { fetchAniList } from '../core/api.js';
 import { playSound } from '../core/audio.js';
-import { MEDIA_FIELDS } from '../core/config.js';
+import { DETAIL_FIELDS } from '../core/config.js';
 import { animeStore } from '../core/state.js';
 import { $, animeTitle, epCount, esc, formatScore, stripHtml, syncScrollLock } from '../core/utils.js';
 import { openEpisodeModal } from './episodes.js';
@@ -18,7 +18,7 @@ export async function openDetail(animeId) {
   $('detailBanner').src = base.bannerImage || base.coverImage.extraLarge;
   $('detailCover').src = base.coverImage.extraLarge;
   $('detailTitle').textContent = animeTitle(base);
-  $('detailDesc').textContent = stripHtml(base.description) || 'Sinopsis belum tersedia.';
+  $('detailDesc').textContent = stripHtml(base.description) || 'Memuat sinopsis…';
   $('detailMeta').innerHTML = `
     <span class="px-2 py-0.5 bg-yellow border-2 border-ink shadow-brutal-sm">★ ${formatScore(base.averageScore)}</span>
     ${base.format ? `<span class="px-2 py-0.5 bg-white border-2 border-ink shadow-brutal-sm">${esc(base.format)}</span>` : ''}
@@ -34,15 +34,14 @@ export async function openDetail(animeId) {
   $('detailModal').scrollTop = 0;
   syncScrollLock();
   try {
-    const gql = `query($id: Int) { Media(id: $id, type: ANIME) {
-      status episodes nextAiringEpisode { episode }
-      studios(isMain: true) { nodes { name } }
-      recommendations(sort: RATING_DESC, perPage: 6) { nodes { mediaRecommendation { ${MEDIA_FIELDS} } } }
-    } }`;
+    const gql = `query($id: Int) { Media(id: $id, type: ANIME) { ${DETAIL_FIELDS} } }`;
     const data = await fetchAniList(gql, { id: animeId });
     if (!detailCurrentAnime || detailCurrentAnime.id !== animeId) return; // modal sudah ditutup / pindah anime
     // perbarui status & jadwal tayang (data watchlist/riwayat bisa basi) supaya episode belum rilis tidak muncul
     const m = data.Media;
+    if (m.description && !base.description) base.description = m.description;
+    $('detailDesc').textContent = stripHtml(base.description) || 'Sinopsis belum tersedia.';
+    if (m.bannerImage && !base.bannerImage) { base.bannerImage = m.bannerImage; $('detailBanner').src = m.bannerImage; }
     Object.assign(base, { status: m.status ?? base.status, episodes: m.episodes ?? base.episodes, nextAiringEpisode: m.nextAiringEpisode });
     animeStore.set(base.id, base);
     const studios = data.Media.studios.nodes.map(s => s.name).join(', ');
@@ -59,7 +58,10 @@ export async function openDetail(animeId) {
       }).join('');
       $('detailRecsWrap').classList.remove('hidden');
     }
-  } catch (err) {}
+  } catch (err) {
+    // gagal ambil detail: jangan biarkan teks "Memuat sinopsis…" menggantung
+    if (detailCurrentAnime && detailCurrentAnime.id === animeId && !stripHtml(base.description)) $('detailDesc').textContent = 'Sinopsis belum tersedia.';
+  }
 }
 export function closeDetail() { detailCurrentAnime = null; resetSocial(); hideModal('detailModal'); }
 export function watchFromDetail() {

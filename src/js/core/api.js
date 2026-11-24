@@ -1,26 +1,54 @@
 // core/api.js
 import { playSound } from './audio.js';
-import { ANILIST_API, MEDIA_FIELDS } from './config.js';
+import { ANILIST_API, CACHE_MAX, CACHE_TTL, LIST_FIELDS } from './config.js';
 import { S } from './state.js';
 import { $, announce } from './utils.js';
 import { renderAnimeCards, showSkeletons } from '../ui/cards.js';
 
+// ==================== CACHE ====================
+const cache = new Map();
+const cacheKey = (query, vars) => query + '\u0000' + JSON.stringify(vars);
+function readCache(key) {
+  const hit = cache.get(key);
+  if (!hit) return null;
+  if (Date.now() - hit.t > CACHE_TTL) { cache.delete(key); return null; }
+  return hit.v;
+}
+function writeCache(key, v) {
+  cache.set(key, { t: Date.now(), v });
+  if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value);
+}
+
 // ==================== API ====================
 export function newListSignal() { if (S.listAbort) S.listAbort.abort(); S.listAbort = new AbortController(); return S.listAbort.signal; }
-export async function fetchAniList(query, variables, signal) {
+async function rawFetch(query, variables, signal, retried = false) {
   const res = await fetch(ANILIST_API, {
     signal,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify({ query, variables }),
   });
-  if (!res.ok) throw new Error('Network Error');
+  // AniList membatasi ~90 req/menit: satu retry sopan saat 429
+  if (res.status === 429 && !retried) {
+    const wait = Math.min(Number(res.headers.get('Retry-After') || 2) * 1000, 5000);
+    await new Promise(r => setTimeout(r, wait));
+    return rawFetch(query, variables, signal, true);
+  }
+  if (!res.ok) throw new Error(`Network Error (${res.status})`);
   const data = await res.json();
   if (data.errors) throw new Error(data.errors[0].message);
   return data.data;
 }
+export async function fetchAniList(query, variables, signal) {
+  const key = cacheKey(query, variables);
+  const hit = readCache(key);
+  if (hit) return hit;
+  const data = await rawFetch(query, variables, signal || (S.listAbort ? S.listAbort.signal : undefined));
+  writeCache(key, data);
+  return data;
+}
 // Satu fungsi untuk semua daftar (home, sort, genre, search, musim) + paginasi + filter konten dewasa
-export async function fetchPage(page, { sort = 'POPULARITY_DESC', genre, search, season, seasonYear } = {}) {
+export async function fetchPage(page, { sort = 'POPULARITY_DESC', genre, search, season, seasonYear, withDescription = false } = {}) {
   const decl = ['$page: Int', '$sort: [MediaSort]'];
   const args = ['type: ANIME', 'isAdult: false', 'sort: $sort'];
   const vars = { page, sort: [sort] };
@@ -31,8 +59,8 @@ export async function fetchPage(page, { sort = 'POPULARITY_DESC', genre, search,
     args.push('season: $season', 'seasonYear: $seasonYear');
     vars.season = season; vars.seasonYear = seasonYear;
   }
-  const q = `query(${decl.join(', ')}) { Page(page: $page, perPage: 24) { pageInfo { hasNextPage } media(${args.join(', ')}) { ${MEDIA_FIELDS} } } }`;
-  const data = await fetchAniList(q, vars, S.listAbort ? S.listAbort.signal : undefined);
+  const q = `query(${decl.join(', ')}) { Page(page: $page, perPage: 24) { pageInfo { hasNextPage } media(${args.join(', ')}) { ${LIST_FIELDS}${withDescription ? ' description' : ''} } } }`;
+  const data = await fetchAniList(q, vars);
   return data.Page;
 }
 // Tampilkan daftar dari loader(page); mengabaikan respons basi bila user sudah pindah tampilan

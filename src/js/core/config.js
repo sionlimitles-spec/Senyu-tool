@@ -2,6 +2,11 @@
 
 // Konfigurasi & konstanta
 export const ANILIST_API = 'https://graphql.anilist.co';
+
+// Cache respons AniList (in-memory). 5 menit cukup untuk sesi browsing.
+export const CACHE_TTL = 5 * 60 * 1000;
+export const CACHE_MAX = 200;
+
 // true = fullscreen bawaan MegaPlay dimatikan; fullscreen lewat tombol kita (wrapper) supaya tombol episode tetap tampil.
 // Set false jika ingin tombol fullscreen di dalam video berfungsi lagi.
 export const LOCK_FULLSCREEN = true;
@@ -12,8 +17,17 @@ export const EP_PAGE = 50;
 export const SUPABASE_URL = 'https://xkmridijfezrykvryiga.supabase.co';
 export const SUPABASE_KEY = 'sb_publishable_LHc0WQIxkgwwaDv8-xftVg_6a2gYibT';
 export const COMMENT_PAGE = 20;
-export const MEDIA_FIELDS = `
+
+// Field daftar: TANPA description (HTML terberat di payload). Home meminta description sendiri untuk hero.
+export const LIST_FIELDS = `
   id idMal title { romaji english } coverImage { extraLarge large } bannerImage
-  averageScore status format genres description episodes seasonYear
+  averageScore status format genres episodes seasonYear
   nextAiringEpisode { episode }
+`;
+// Field detail: baru diambil saat modal detail dibuka.
+export const DETAIL_FIELDS = `
+  ${LIST_FIELDS}
+  description
+  studios(isMain: true) { nodes { name } }
+  recommendations(sort: RATING_DESC, perPage: 6) { nodes { mediaRecommendation { ${LIST_FIELDS} isAdult } } }
 `;

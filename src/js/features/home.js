@@ -1,5 +1,5 @@
 // features/home.js
-import { fetchPage, showListError } from '../core/api.js';
+import { fetchPage, newListSignal, showListError } from '../core/api.js';
 import { playSound } from '../core/audio.js';
 import { S, animeStore } from '../core/state.js';
 import { $, animeTitle, epCount, esc, formatScore, stripHtml } from '../core/utils.js';
@@ -13,11 +13,13 @@ let heroList = [], heroIndex = 0;
 let heroUserPaused = false, heroHover = false, heroOffscreen = false;
 
 // ==================== HOME ====================
-export const trendingLoader = p => fetchPage(p, { sort: 'TRENDING_DESC' });
+// description hanya diminta di halaman 1 (dipakai teks hero); halaman berikutnya ringan
+export const trendingLoader = p => fetchPage(p, { sort: 'TRENDING_DESC', withDescription: p === 1 });
 
 export async function loadHome() {
   renderContinueWatching();
   showSkeletons();
+  newListSignal(); // controller baru: goHome() meng-abort yang lama, tanpa ini request langsung AbortError dan skeleton macet
   const my = ++S.listReq;
   try {
     const page = await trendingLoader(1);

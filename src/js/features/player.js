@@ -8,6 +8,7 @@ import { saveHistory } from './history.js';
 import { hideModal, showModalFx, showToast } from '../ui/ui.js';
 
 let subHintShown = false;
+let playerTimeout = 0;
 
 // ==================== PLAYER ====================
 export function playEpisode(idMal, epNum, title, totalEps, coverImage) {
@@ -26,7 +27,7 @@ export function playEpisode(idMal, epNum, title, totalEps, coverImage) {
 
 // Iframe dibuat ulang total, bukan cuma ganti src
 export function loadVideo() {
-  clearTimeout(window.playerTimeout); // timer lama harus mati sebelum timer baru dibuat
+  clearTimeout(playerTimeout); // timer lama harus mati sebelum timer baru dibuat
   const { idMal, epNum } = playerState;
   $('playerLoading').classList.remove('hidden');
   $('playerError').classList.add('hidden');
@@ -44,18 +45,18 @@ export function loadVideo() {
   iframe.className = 'w-full h-full border-0 absolute inset-0';
   if (!LOCK_FULLSCREEN) iframe.setAttribute('allowfullscreen', '');
   iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture' + (LOCK_FULLSCREEN ? '' : '; fullscreen'));
-  iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+  iframe.setAttribute('referrerpolicy', 'origin'); // hanya domain, tanpa path/query halaman
   iframe.src = url;
 
   let loaded = false;
   iframe.onload = () => {
     if (loaded) return; loaded = true;
-    clearTimeout(window.playerTimeout);
+    clearTimeout(playerTimeout);
     $('playerLoading').classList.add('hidden');
   };
   container.appendChild(iframe);
 
-  window.playerTimeout = setTimeout(() => {
+  playerTimeout = setTimeout(() => {
     if (loaded || !iframe.isConnected) return;
     $('playerLoading').classList.add('hidden');
     $('playerError').classList.remove('hidden');
@@ -126,7 +127,7 @@ export function changeEpisode(dir) {
 export function closePlayerModal() {
   if (isFs()) exitFs();
   $('videoContainer').querySelectorAll('iframe').forEach(f => f.remove());
-  clearTimeout(window.playerTimeout);
+  clearTimeout(playerTimeout);
   hideModal('playerModal');
 }
 
