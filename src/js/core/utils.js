@@ -12,7 +12,14 @@ export function stripHtml(s) {
   return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
 }
 export const animeTitle = a => a.title.english || a.title.romaji;
-export const epCount = a => a.episodes || (a.nextAiringEpisode ? Math.max(a.nextAiringEpisode.episode - 1, 1) : 12);
+// Jumlah episode yang SUDAH tayang (episode berikutnya yang dijadwalkan belum dihitung).
+// 0 = belum ada yang tayang.
+export const epCount = a => {
+  if (a.status === 'NOT_YET_RELEASED') return 0;
+  const next = a.nextAiringEpisode && a.nextAiringEpisode.episode;
+  if (next) return Math.max(next - 1, 0);
+  return a.episodes || 12;
+};
 export function lsGet(k, fb) { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v ?? fb; } catch (e) { return fb; } }
 export function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
 export const SMOOTH = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';

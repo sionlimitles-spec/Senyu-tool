@@ -33,11 +33,16 @@ export async function openDetail(animeId) {
   syncScrollLock();
   try {
     const gql = `query($id: Int) { Media(id: $id, type: ANIME) {
+      status episodes nextAiringEpisode { episode }
       studios(isMain: true) { nodes { name } }
       recommendations(sort: RATING_DESC, perPage: 6) { nodes { mediaRecommendation { ${MEDIA_FIELDS} } } }
     } }`;
     const data = await fetchAniList(gql, { id: animeId });
     if (!detailCurrentAnime || detailCurrentAnime.id !== animeId) return; // modal sudah ditutup / pindah anime
+    // perbarui status & jadwal tayang (data watchlist/riwayat bisa basi) supaya episode belum rilis tidak muncul
+    const m = data.Media;
+    Object.assign(base, { status: m.status ?? base.status, episodes: m.episodes ?? base.episodes, nextAiringEpisode: m.nextAiringEpisode });
+    animeStore.set(base.id, base);
     const studios = data.Media.studios.nodes.map(s => s.name).join(', ');
     if (studios) $('detailStudios').textContent = `Studio: ${studios}`;
     const recs = data.Media.recommendations.nodes.map(r => r.mediaRecommendation).filter(r => r && !(r.isAdult));

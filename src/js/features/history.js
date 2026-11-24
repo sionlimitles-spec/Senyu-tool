@@ -1,7 +1,7 @@
 // features/history.js
 import { playSound } from '../core/audio.js';
-import { S } from '../core/state.js';
-import { $, esc, jsArg, lsGet, lsSet } from '../core/utils.js';
+import { S, animeStore } from '../core/state.js';
+import { $, epCount, esc, jsArg, lsGet, lsSet } from '../core/utils.js';
 import { openEpisodeModal } from './episodes.js';
 import { showToast } from '../ui/ui.js';
 
@@ -31,4 +31,7 @@ export function renderContinueWatching() {
       <p class="text-[11px] font-bold mt-2 line-clamp-2">${esc(h.title)}</p>
     </div>`).join('');
 }
-export function resumeWatch(idMal, title, epNum, totalEps, coverImage) { openEpisodeModal(idMal, title, totalEps, coverImage, epNum); }
+export function resumeWatch(idMal, title, epNum, totalEps, coverImage) {
+  const fresh = [...animeStore.values()].find(a => a.idMal === idMal);
+  openEpisodeModal(idMal, title, fresh ? Math.max(epCount(fresh), epNum) : totalEps, coverImage, epNum);
+}

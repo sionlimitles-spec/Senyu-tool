@@ -15,6 +15,7 @@ export function markWatched(idMal, ep) {
   set.add(ep); all[idMal] = [...set]; lsSet('kstream_watched', all);
 }
 export function openEpisodeModal(idMal, title, totalEps, coverImage, jumpTo = null) {
+  if (!(totalEps >= 1)) { showToast('Belum ada episode yang tayang', 'warn'); return; }
   const hist = getHistory().find(h => h.idMal === idMal);
   S.episodeCtx = { idMal, title, totalEps, coverImage, last: hist ? hist.epNum : null };
   if (jumpTo) return playEpisode(idMal, jumpTo, title, totalEps, coverImage);
